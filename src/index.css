@@ -1,0 +1,56 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Pretendard", -apple-system, BlinkMacSystemFont, system-ui, Roboto, "Helvetica Neue", "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  --font-serif: "Cormorant Garamond", Georgia, serif;
+  
+  --color-pastel-mint: #F2ECE4;
+  --color-pastel-cream: #FAF8F5;
+  --color-pastel-rose: #F5EFE8;
+  --color-pastel-blue: #ECE5DC;
+  --color-ink: #2c2824;
+  --color-accent: #a58e74; /* Warm Terracotta Gold */
+  --color-accent-dark: #8f7a63;
+  --color-accent-light: #bead9a;
+  --color-accent-soft: #f8f5f1;
+}
+
+@layer base {
+  * {
+    font-style: normal !important;
+  }
+  
+  body {
+    @apply font-sans text-ink bg-[#FAF8F5] antialiased font-normal;
+    font-size: 14px;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-sans font-medium tracking-tight text-ink;
+  }
+
+  .comment-font, .eyebrow-font {
+    font-family: var(--font-sans);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+}
+
+.glass {
+  background: rgba(250, 248, 245, 0.92);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(165, 142, 116, 0.15);
+}
+
+.section-padding {
+  @apply py-28 md:py-36 px-8 md:px-16;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+

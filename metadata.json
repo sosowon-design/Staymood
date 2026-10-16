@@ -1,0 +1,8 @@
+{
+  "name": "Staymood",
+  "description": "Staymood is a premium web design agency specializing in crafting emotional, bespoke digital spaces for lifestyle stays, boutique accommodations, and curated interior brands.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
