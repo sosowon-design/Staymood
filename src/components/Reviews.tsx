@@ -69,7 +69,7 @@ export default function Reviews() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1, duration: 0.8 }}
-            className="text-[30px] font-sans font-semibold text-ink leading-snug"
+            className="text-[24px] sm:text-[30px] md:max-lg:text-[28px] font-sans font-semibold text-ink leading-snug"
           >
             스테이무드와 함께한 <span className="text-accent">호스트의 제작 후기</span>
           </motion.h2>

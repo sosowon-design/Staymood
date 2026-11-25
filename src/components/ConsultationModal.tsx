@@ -58,7 +58,8 @@ export default function ConsultationModal({
           animate={{ opacity: 1, y: 0, scale: 1 }}
           exit={{ opacity: 0, y: 10, scale: 0.95 }}
           transition={{ duration: 0.2, ease: "easeOut" }}
-          className="fixed bottom-[120px] right-4 sm:right-6 z-50 w-[300px] sm:w-[320px] bg-white/95 backdrop-blur-md rounded-2xl border border-accent/25 shadow-2xl p-4 font-sans text-ink"
+          className="fixed bottom-[130px] right-6 z-[10000] w-[300px] sm:w-[320px] bg-white/95 backdrop-blur-md rounded-2xl border border-accent/25 shadow-2xl p-4 font-sans text-ink"
+          style={{ position: "fixed", bottom: "130px", right: "24px", zIndex: 10000 }}
         >
           {/* Header */}
           <div className="flex items-center justify-between pb-3 border-b border-accent/15">
@@ -139,7 +140,7 @@ export default function ConsultationModal({
             {/* Operating Hours */}
             <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-accent/5 text-[11.5px] text-gray-600">
               <Clock size={13} className="text-accent flex-shrink-0" />
-              <span>상담 시간: 평일 9:00 ~ 18:00</span>
+              <span>평일 10:00 ~ 19:00 (주말·공휴일 휴무)</span>
             </div>
           </div>
 
@@ -151,7 +152,7 @@ export default function ConsultationModal({
             }}
             className="w-full mt-1 py-2.5 px-3 rounded-xl bg-accent hover:bg-accent-dark text-white font-medium text-[12.5px] transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-1.5 cursor-pointer group transform hover:-translate-y-0.5 active:translate-y-0"
           >
-            <span>신청폼 작성하기</span>
+            <span>무료 진단 및 견적 신청</span>
             <ArrowRight size={13} />
           </button>
         </motion.div>

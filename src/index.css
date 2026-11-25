@@ -25,10 +25,13 @@
   body {
     @apply font-sans text-ink bg-[#FAF8F5] antialiased font-normal;
     font-size: 14px;
+    word-break: keep-all;
+    overflow-wrap: break-word;
   }
   
   h1, h2, h3, h4, h5, h6 {
     @apply font-sans font-medium tracking-tight text-ink;
+    word-break: keep-all;
   }
 
   .comment-font, .eyebrow-font {

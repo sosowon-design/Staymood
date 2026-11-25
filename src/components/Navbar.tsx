@@ -7,11 +7,13 @@ export default function Navbar({
   currentPage = "home",
   isMobileMenuOpen: externalMobileMenuOpen,
   onMobileMenuChange,
+  activeSectionOverride,
 }: { 
   onNavigate?: (href: string) => void;
   currentPage?: "home" | "projects";
   isMobileMenuOpen?: boolean;
   onMobileMenuChange?: (open: boolean) => void;
+  activeSectionOverride?: string | null;
 }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [internalMobileMenuOpen, setInternalMobileMenuOpen] = useState(false);
@@ -28,36 +30,53 @@ export default function Navbar({
   const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
+    if (activeSectionOverride) {
+      setActiveSection(activeSectionOverride);
+      setIsScrolled(true);
+      return;
+    }
+
+    if (currentPage === "projects") {
+      setActiveSection("work");
+      setIsScrolled(true);
+      return;
+    }
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
 
       // Check if user is near bottom of the page (Contact section)
-      const isBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 150;
+      const isBottom = window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 160;
       if (isBottom) {
         setActiveSection("contact");
         return;
       }
 
-      const sections = ["about", "work", "services", "reviews", "contact"];
-      const scrollPosition = window.scrollY + 200;
+      // Check sections from bottom to top to accurately match scroll offset
+      const sections = ["contact", "services", "work", "about"];
+      const scrollYPos = window.scrollY + 220;
 
       for (const sectionId of sections) {
         const el = document.getElementById(sectionId);
         if (el) {
-          const top = el.offsetTop;
-          const height = el.offsetHeight;
-          if (scrollPosition >= top && scrollPosition < top + height) {
+          const rect = el.getBoundingClientRect();
+          const top = rect.top + window.scrollY;
+          if (scrollYPos >= top) {
             setActiveSection(sectionId);
-            break;
+            return;
           }
         }
+      }
+
+      if (window.scrollY < 200) {
+        setActiveSection("");
       }
     };
 
     window.addEventListener("scroll", handleScroll);
     handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [currentPage, activeSectionOverride]);
 
   const navLinks = [
     { id: "about", name: "스테이무드 소개", href: "#about" },
@@ -65,13 +84,31 @@ export default function Navbar({
     { id: "services", name: "가격 안내", href: "#services" },
   ];
 
-  const isDarkNavbar = isScrolled || currentPage === "projects";
+  const isDarkNavbar = isScrolled || currentPage === "projects" || Boolean(activeSectionOverride) || isMobileMenuOpen;
 
   const handleClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     if (onNavigate) {
       e.preventDefault();
       onNavigate(href);
     }
+  };
+
+  const handleMobileNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    e.preventDefault();
+    handleToggleMobileMenu(false);
+    setTimeout(() => {
+      if (onNavigate) {
+        onNavigate(href);
+      } else {
+        const id = href.replace("#", "");
+        const element = document.getElementById(id);
+        if (element) {
+          const yOffset = -70;
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
+        }
+      }
+    }, 80);
   };
 
   return (
@@ -118,7 +155,8 @@ export default function Navbar({
         {/* Desktop Nav */}
         <div className="hidden md:flex items-center gap-1.5 lg:gap-2.5">
           {navLinks.map((link) => {
-            const isActive = activeSection === link.id;
+            const currentSection = activeSectionOverride || (currentPage === "projects" ? "work" : activeSection);
+            const isActive = currentSection === link.id;
             return (
               <a 
                 key={link.name}
@@ -163,7 +201,7 @@ export default function Navbar({
                   : "bg-white/20 border border-white/40 text-white hover:bg-accent hover:border-accent hover:text-white backdrop-blur-sm"
             }`}
           >
-            상담 신청하기
+            제작 문의하기
             {activeSection === "contact" && (
               <motion.span 
                 layoutId="activeNavDiagonalDot"
@@ -188,38 +226,58 @@ export default function Navbar({
         </button>
       </div>
 
+      {/* Mobile Menu Top Divider Line below Logo */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden w-full border-b border-accent/15 mt-2" />
+      )}
+
       {/* Mobile Menu */}
       <motion.div
         initial={false}
         animate={isMobileMenuOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
-        className="md:hidden absolute top-full left-0 w-full bg-[#FAF8F5] border-b border-accent/20 overflow-hidden shadow-lg z-50"
+        className="md:hidden absolute top-full left-0 w-full bg-[#FAF8F5]/98 backdrop-blur-md border-b border-accent/20 overflow-hidden shadow-lg z-50"
       >
-        <div className="flex flex-col items-center justify-center py-6 gap-5 px-6 font-sans text-center">
-          {navLinks.map((link) => (
-            <a 
-              key={link.name}
-              href={link.href}
-              onClick={(e) => {
-                handleClick(e, link.href);
-                handleToggleMobileMenu(false);
-              }}
-              className={`text-[15px] transition-all ${
-                activeSection === link.id ? "text-accent font-semibold" : "text-ink font-normal hover:text-accent"
-              }`}
-            >
-              {link.name}
-            </a>
-          ))}
-          <a 
-            href="#contact"
-            onClick={(e) => {
-              handleClick(e, "#contact");
-              handleToggleMobileMenu(false);
-            }}
-            className="mt-2 px-6 py-2.5 bg-accent text-white rounded-full text-[13px] font-medium tracking-wider text-center w-full max-w-xs shadow-xs"
-          >
-            상담 신청하기
-          </a>
+        <div className="flex flex-col items-center justify-center py-6 gap-2.5 px-6 font-sans text-center">
+          {(() => {
+            const currentSection = activeSectionOverride || (currentPage === "projects" ? "work" : activeSection);
+            return (
+              <>
+                {navLinks.map((link) => {
+                  const isActive = currentSection === link.id;
+
+                  return (
+                    <a 
+                      key={link.name}
+                      href={link.href}
+                      onClick={(e) => handleMobileNavClick(e, link.href)}
+                      className={`relative flex items-center justify-center gap-2 w-full max-w-xs py-2.5 px-4 rounded-xl text-[15px] transition-all duration-200 ${
+                        isActive
+                          ? "bg-accent/15 text-accent font-semibold border border-accent/30 shadow-2xs" 
+                          : "text-ink/80 font-normal hover:bg-black/5 hover:text-ink border border-transparent"
+                      }`}
+                    >
+                      {isActive && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+                      )}
+                      <span>{link.name}</span>
+                    </a>
+                  );
+                })}
+
+                {/* 제작 문의하기 button in mobile menu */}
+                <a 
+                  href="#contact"
+                  onClick={(e) => handleMobileNavClick(e, "#contact")}
+                  className="mt-2 flex items-center justify-center gap-2 px-6 py-2.5 rounded-full text-[15px] font-medium tracking-wider text-center w-full max-w-xs transition-all duration-200 shadow-xs bg-accent text-white hover:bg-accent/90"
+                >
+                  {currentSection === "contact" && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-white/90 animate-pulse" />
+                  )}
+                  <span>제작 문의하기</span>
+                </a>
+              </>
+            );
+          })()}
         </div>
       </motion.div>
     </nav>

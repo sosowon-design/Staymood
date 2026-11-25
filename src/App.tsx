@@ -7,26 +7,25 @@ import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import Portfolio from "./components/Portfolio";
 import Services from "./components/Services";
+import BrandPhilosophy from "./components/BrandPhilosophy";
 import Contact from "./components/Contact";
 import Footer from "./components/Footer";
 import ConsultationModal from "./components/ConsultationModal";
-import { motion, useScroll, useSpring, AnimatePresence } from "motion/react";
+import { motion, useScroll, useSpring, AnimatePresence, useMotionValueEvent } from "motion/react";
 import { useState, useEffect } from "react";
 import { ArrowLeft, ExternalLink, ArrowUp, X, ArrowRight, Compass, Sparkles, CheckCircle2, Link2, ShieldCheck, MessageCircle } from "lucide-react";
 import seorimyeongaImage from "./assets/images/brand_philosophy_staymood_1786383942128.jpg";
 import sosowonImage from "./assets/images/regenerated_image_1792044901311.jpg";
-import dearforestImage from "./assets/images/staymood_trust_architecture_1786645050482.jpg";
+import yunseulImage from "./assets/images/regenerated_image_1792245625113.avif";
 import atelzerozImage from "./assets/images/staymood_atelier_interior_1786651370823.jpg";
-import aroundfollieImage from "./assets/images/staymood_philosophy_bg_1786458408069.jpg";
-import momentoffImage from "./assets/images/staymood_web_studio_workspace_1786647265560.jpg";
+import stayonulImage from "./assets/images/staymood_philosophy_bg_1786458408069.jpg";
 
 const allProjects = [
-  { id: 1, title: "서림연가 (Seorim Yeonga)", category: "Aesthetic Stay / Branding & Web", image: seorimyeongaImage, description: "대나무 숲의 사스락거리는 소리와 고요한 한옥의 온도를 시각적 레이아웃으로 풀어낸 프리미엄 숙소 플랫폼", link: "#" },
-  { id: 2, title: "소소원 (Sosowon)", category: "Private Pool Villa / Web Space", image: sosowonImage, description: "제주 고즈넉한 돌담 숲속에 머무는 단 한 팀만을 위한 고요한 프라이빗 독채 펜션", link: "https://sosowon-jeju.netlify.app" },
-  { id: 3, title: "디어 림 (Stay Dear Forest)", category: "Private Pool Villa / Web Space", image: dearforestImage, description: "깊은 자연 속에 숨겨진 풀빌라 독채의 지형적 수려함을 미디어 연출 모션으로 녹여낸 웹사이트", link: "#" },
-  { id: 4, title: "아뜰리에 오즈 (Atelier Oz)", category: "Creative Portfolio Archive", image: atelzerozImage, description: "세라믹 아티스트들의 시그니처 흙빛 질감과 비정형의 가치를 정적인 여백의 미학으로 표현한 브랜드 디렉토리", link: "#" },
-  { id: 5, title: "어라운드 폴리 (Around Follie)", category: "Outdoor Stay / Editorial Strategy", image: aroundfollieImage, description: "자연 속에 머무는 글램핑과 조립식 하우스 스테이의 내추럴한 감성을 직조한 감성 공간 포탈", link: "#" },
-  { id: 6, title: "모먼트 오프 (Moment Off)", category: "Lifestyle Fabric / Digital Commerce", image: momentoffImage, description: "일상에 쉼표를 주는 오가닉 린넨 패브릭 소품 브랜드의 편안함을 다듬은 디렉트 웹 스토어", link: "#" },
+  { id: 2, title: "소소원 (Sosowon)", category: "Private Pool Villa / Web Space", image: sosowonImage, description: "제주 돌담과 푸른 정원 속 고즈넉한 여유가 머무는 프라이빗 독채 스테이", link: "https://sosowon-jeju.netlify.app/" },
+  { id: 1, title: "서림재 (Seorimjae)", category: "Private Pool Villa / Web Space", image: seorimyeongaImage, description: "오대산 소나무 숲의 고요한 풍경 속에서 자연과 함께 머무는 독채 풀빌라", link: "https://seorimjae.netlify.app/" },
+  { id: 4, title: "아눅 스테이 (Anuk Stay)", category: "Aesthetic Pool Villa / Branding & Web", image: atelzerozImage, description: "차분한 공간을 채우는 따스한 빛과 섬세한 디테일이 머무는 감성 풀빌라", link: "https://anuk-stay.netlify.app/" },
+  { id: 3, title: "윤슬 스테이 (Yunseul Stay)", category: "Private Pool Villa / Web Space", image: yunseulImage, description: "햇살에 반짝이는 윤슬과 잔잔한 파도 소리를 온전히 즐기는 오션뷰 스테이", link: "https://yunseul-stay.netlify.app/" },
+  { id: 5, title: "스테이 온을 (Stay Onul)", category: "Private Stay / Web Space", image: stayonulImage, description: "부드러운 색감과 포근한 인테리어가 어우러진 아늑한 감성 스테이", link: "https://stay-onul.netlify.app/" },
 ];
 
 export default function App() {
@@ -34,7 +33,7 @@ export default function App() {
   const [isPhilosophyModalOpen, setIsPhilosophyModalOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isConsultModalOpen, setIsConsultModalOpen] = useState(false);
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress, scrollY } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
     stiffness: 100,
     damping: 30,
@@ -42,6 +41,8 @@ export default function App() {
   });
 
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [activeSectionOverride, setActiveSectionOverride] = useState<string | null>(null);
+  const [pendingScroll, setPendingScroll] = useState<string | null>(null);
 
   const handleMobileMenuChange = (open: boolean) => {
     setIsMobileMenuOpen(open);
@@ -50,27 +51,84 @@ export default function App() {
     }
   };
 
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, [currentPage]);
+  const checkScrollState = (y?: number) => {
+    if (typeof window === "undefined") return;
+
+    const scrollPos = Math.max(
+      typeof y === "number" ? y : 0,
+      window.scrollY || 0,
+      window.pageYOffset || 0,
+      document.documentElement.scrollTop || 0,
+      document.body.scrollTop || 0,
+      document.scrollingElement?.scrollTop || 0
+    );
+
+    // Show floating banner and top button as soon as user scrolls past top (40px)
+    if (scrollPos > 40) {
+      setShowScrollTop(true);
+    } else if (scrollPos <= 10) {
+      setShowScrollTop(false);
+      setIsConsultModalOpen(false);
+    }
+  };
+
+  // Immediate frame-by-frame Motion scroll detection across mobile, tablet, and desktop
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    checkScrollState(latest);
+  });
 
   useEffect(() => {
-    const handleScroll = () => {
-      const shouldShow = window.scrollY > 300;
-      setShowScrollTop(shouldShow);
-      if (!shouldShow) {
-        setIsConsultModalOpen(false);
-      }
+    if (!pendingScroll) {
+      window.scrollTo(0, 0);
+    }
+  }, [currentPage, pendingScroll]);
+
+  useEffect(() => {
+    const handleScrollOrTouch = () => {
+      checkScrollState();
     };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+
+    const handleResize = () => {
+      if (window.innerWidth >= 768 && isMobileMenuOpen) {
+        setIsMobileMenuOpen(false);
+      }
+      checkScrollState();
+    };
+
+    // Initial check
+    checkScrollState();
+    const timer = setTimeout(checkScrollState, 100);
+
+    window.addEventListener("scroll", handleScrollOrTouch, { passive: true, capture: true });
+    window.addEventListener("touchmove", handleScrollOrTouch, { passive: true, capture: true });
+    window.addEventListener("wheel", handleScrollOrTouch, { passive: true, capture: true });
+    window.addEventListener("resize", handleResize, { passive: true });
+    document.addEventListener("scroll", handleScrollOrTouch, { passive: true, capture: true });
+    document.documentElement.addEventListener("scroll", handleScrollOrTouch, { passive: true, capture: true });
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener("scroll", handleScrollOrTouch, true);
+      window.removeEventListener("touchmove", handleScrollOrTouch, true);
+      window.removeEventListener("wheel", handleScrollOrTouch, true);
+      window.removeEventListener("resize", handleResize);
+      document.removeEventListener("scroll", handleScrollOrTouch, true);
+      document.documentElement.removeEventListener("scroll", handleScrollOrTouch, true);
+    };
+  }, [currentPage, isMobileMenuOpen]);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const [pendingScroll, setPendingScroll] = useState<string | null>(null);
+  const handleBackToHome = () => {
+    setActiveSectionOverride("about");
+    setPendingScroll("about");
+    setCurrentPage("home");
+    setTimeout(() => {
+      setActiveSectionOverride(null);
+    }, 1400);
+  };
 
   const handleNavigate = (href: string) => {
     const id = href.replace("#", "");
@@ -80,7 +138,9 @@ export default function App() {
     } else {
       const element = document.getElementById(id);
       if (element) {
-        element.scrollIntoView({ behavior: "smooth" });
+        const yOffset = -70;
+        const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+        window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
       }
     }
   };
@@ -90,7 +150,9 @@ export default function App() {
       const timer = setTimeout(() => {
         const element = document.getElementById(pendingScroll);
         if (element) {
-          element.scrollIntoView({ behavior: "smooth" });
+          const yOffset = -70;
+          const y = element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+          window.scrollTo({ top: Math.max(0, y), behavior: "smooth" });
           setPendingScroll(null);
         }
       }, 100);
@@ -107,182 +169,7 @@ export default function App() {
       className="scroll-smooth w-full"
     >
       <Hero />
-      
-      {/* Brand Philosophy Section - Why Staymood */}
-      <section id="about" className="py-24 md:py-32 relative font-sans border-t border-accent/15 bg-[#F2ECE4]">
-        <div className="max-w-6xl mx-auto px-6 md:px-12 relative z-10">
-          
-          {/* Section Header with Concise Annotation & 30px Title */}
-          <div className="mb-12 text-center max-w-3xl mx-auto space-y-3">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-[12px] font-sans tracking-wider text-accent font-semibold uppercase shadow-2xs">
-                <Compass size={13} className="text-accent" />
-                <span>Brand Philosophy</span>
-              </span>
-            </motion.div>
-
-            <motion.h2 
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="text-[30px] font-sans font-semibold text-ink leading-snug"
-            >
-              공간의 첫인상이 되는 <span className="text-accent">감성 브랜드 웹사이트</span>를 완성합니다
-            </motion.h2>
-
-            <motion.p
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.15 }}
-              className="text-[15px] text-gray-700 font-sans max-w-2xl mx-auto leading-relaxed pt-1"
-            >
-              숙소 고유의 결을 감각적인 디지털 인터랙션으로 풀어내어 즉각적인 예약 연결로 이끕니다.
-            </motion.p>
-          </div>
-
-          {/* 01~03 Feature Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-left font-sans relative z-10">
-            
-            {/* Card 1 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1, duration: 0.5 }}
-                whileHover={{ y: -6, transition: { duration: 0.18, ease: "easeOut" } }}
-                className="bg-white/95 backdrop-blur-md p-7 md:p-8 rounded-2xl border border-white/80 shadow-md hover:border-accent/60 hover:shadow-xl transition-all flex flex-col justify-between group cursor-pointer"
-              >
-                <div>
-                  <div className="mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-accent/20 text-[12px] font-semibold text-accent font-sans shadow-2xs">
-                      <Sparkles size={13} className="text-accent flex-shrink-0" />
-                      <span>01. 감성 연출</span>
-                    </span>
-                  </div>
-
-                  <h3 className="text-[19px] md:text-[20px] font-sans font-semibold text-ink mb-2.5 leading-snug group-hover:text-accent transition-colors">
-                    독보적 감성 비주얼 연출
-                  </h3>
-                  
-                  <p className="text-[13px] text-gray-600 font-normal leading-relaxed mb-4">
-                    사진 한 장의 한계를 넘어, 숙소의 조도와 쉼의 분위기를 생생한 웹 모션으로 구현하여 게스트의 시선을 사로잡습니다.
-                  </p>
-
-                  <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-accent/15 space-y-1.5 mb-4">
-                    <div className="flex items-center gap-2 text-[12px] text-gray-700 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-                      <span>숙소 고유 톤앤매너 1:1 맞춤 기획</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[12px] text-gray-700 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-                      <span>모바일·태블릿·PC 100% 최적화</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-3.5 border-t border-accent/10 flex items-center gap-2 text-[12px] text-accent font-semibold font-sans">
-                  <CheckCircle2 size={14} />
-                  <span>체류 시간을 늘리는 감성 UI/UX</span>
-                </div>
-              </motion.div>
-
-              {/* Card 2 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.15, duration: 0.5 }}
-                whileHover={{ y: -6, transition: { duration: 0.18, ease: "easeOut" } }}
-                className="bg-white/95 backdrop-blur-md p-7 md:p-8 rounded-2xl border border-white/80 shadow-md hover:border-accent/60 hover:shadow-xl transition-all flex flex-col justify-between group cursor-pointer"
-              >
-                <div>
-                  <div className="mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-accent/20 text-[12px] font-semibold text-accent font-sans shadow-2xs">
-                      <Link2 size={13} className="text-accent flex-shrink-0" />
-                      <span>02. 예약 연동</span>
-                    </span>
-                  </div>
-
-                  <h3 className="text-[19px] md:text-[20px] font-sans font-semibold text-ink mb-2.5 leading-snug group-hover:text-accent transition-colors">
-                    원클릭 외부 예약 연동
-                  </h3>
-                  
-                  <p className="text-[13px] text-gray-600 font-normal leading-relaxed mb-4">
-                    기존에 사용 중이신 네이버 예약, 에어비앤비, 스테이폴리오 등 외부 예약 채널로 손쉽게 버튼 하나로 직결합니다.
-                  </p>
-
-                  <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-accent/15 space-y-1.5 mb-4">
-                    <div className="flex items-center gap-2 text-[12px] text-gray-700 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-                      <span>네이버 예약 / 에어비앤비 다이렉트 버튼</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[12px] text-gray-700 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-                      <span>불필요한 결제 모듈 없이 간편 관리</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-3.5 border-t border-accent/10 flex items-center gap-2 text-[12px] text-accent font-semibold font-sans">
-                  <CheckCircle2 size={14} />
-                  <span>예약 유입 전환율 극대화</span>
-                </div>
-              </motion.div>
-
-              {/* Card 3 */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.2, duration: 0.5 }}
-                whileHover={{ y: -6, transition: { duration: 0.18, ease: "easeOut" } }}
-                className="bg-white/95 backdrop-blur-md p-7 md:p-8 rounded-2xl border border-white/80 shadow-md hover:border-accent/60 hover:shadow-xl transition-all flex flex-col justify-between group cursor-pointer"
-              >
-                <div>
-                  <div className="mb-4">
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#FAF8F5] border border-accent/20 text-[12px] font-semibold text-accent font-sans shadow-2xs">
-                      <ShieldCheck size={13} className="text-accent flex-shrink-0" />
-                      <span>03. 전담 케어</span>
-                    </span>
-                  </div>
-
-                  <h3 className="text-[19px] md:text-[20px] font-sans font-semibold text-ink mb-2.5 leading-snug group-hover:text-accent transition-colors">
-                    검색 최적화 & 파트너십
-                  </h3>
-                  
-                  <p className="text-[13px] text-gray-600 font-normal leading-relaxed mb-4">
-                    네이버·구글 포털 검색 최적화(SEO)와 지도 등록을 꼼꼼히 세팅하고, 런칭 이후에도 안정적인 운영을 지원합니다.
-                  </p>
-
-                  <div className="p-3.5 rounded-xl bg-[#FAF8F5] border border-accent/15 space-y-1.5 mb-4">
-                    <div className="flex items-center gap-2 text-[12px] text-gray-700 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-                      <span>네이버·구글 포털 SEO 상위 검색 등록</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-[12px] text-gray-700 font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
-                      <span>오픈 후 꼼꼼한 사이트 점검 및 운영 지원</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="pt-3.5 border-t border-accent/10 flex items-center gap-2 text-[12px] text-accent font-semibold font-sans">
-                  <CheckCircle2 size={14} />
-                  <span>검색 노출 & 런칭 후 안정적 케어</span>
-                </div>
-              </motion.div>
-
-            </div>
-
-        </div>
-      </section>
-
+      <BrandPhilosophy />
       <Portfolio onViewAll={() => setCurrentPage("projects")} />
       <Services onViewPortfolio={() => setCurrentPage("projects")} />
       <Contact onViewPortfolio={() => setCurrentPage("projects")} />
@@ -296,18 +183,18 @@ export default function App() {
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.6 }}
-      className="pt-36 sm:pt-40 pb-0 bg-[#F2ECE4] min-h-screen text-ink font-sans flex flex-col justify-between"
+      className="pt-20 sm:pt-40 pb-0 bg-[#F2ECE4] min-h-screen text-ink font-sans flex flex-col justify-between"
     >
-      <div className="max-w-6xl mx-auto px-6 md:px-12 pb-24 w-full">
+      <div className="max-w-6xl mx-auto px-6 md:px-12 pb-20 w-full">
         {/* Elegant Floating Top Bar with Redesigned Back to Home Button */}
-        <div className="flex items-center justify-between mb-10">
+        <div className="flex items-center justify-between mb-14 sm:mb-10">
           <motion.button 
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setCurrentPage("home")}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-accent/25 text-[13px] text-ink font-medium shadow-xs hover:border-accent hover:text-accent transition-all cursor-pointer font-sans group"
+            onClick={handleBackToHome}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#FAF8F5] border border-[#8F7A63]/35 text-[13px] text-[#7A6652] font-medium hover:bg-[#8F7A63] hover:border-[#8F7A63] hover:text-white transition-all duration-200 cursor-pointer font-sans group"
           >
-            <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform text-accent" />
+            <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
             <span>메인 홈으로 돌아가기</span>
           </motion.button>
         </div>
@@ -321,138 +208,99 @@ export default function App() {
           >
             <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-accent/10 border border-accent/20 text-[12px] font-sans tracking-wider text-accent font-semibold uppercase">
               <Sparkles size={13} className="text-accent" />
-              <span>Selected Portfolio Cases</span>
+              <span>MAIN PORTFOLIO</span>
             </span>
           </motion.div>
 
-          <h1 className="text-[30px] font-sans font-semibold text-ink leading-snug">
-            실제 예약 전환을 이끈 <span className="text-accent">스테이무드 포트폴리오</span>
+          <h1 className="text-[24px] sm:text-[30px] md:max-lg:text-[28px] font-sans font-semibold text-ink leading-snug break-keep">
+            <span className="text-[#2C2824]">공간의 결을 담은 </span>
+            <span className="inline text-accent">대표 프로젝트</span>
           </h1>
-          <p className="text-[13.5px] md:text-[14px] text-gray-600 font-normal leading-relaxed pt-0.5">
-            머무는 공간의 감성을 살려 실제 예약 전환으로 연결한 오픈 프로젝트 아카이브입니다.
+          <p className="text-[14px] sm:text-[15px] text-gray-600 font-normal leading-relaxed pt-0.5 break-keep">
+            <span>숙소마다 지닌 특별한 분위기와 매력을 </span>
+            <span className="block sm:inline">온전히 담아 완성한 웹사이트입니다.</span>
           </p>
         </div>
 
-        {/* Horizontal Compact Card Layout matching previous design */}
+        {/* Portfolio Cards: Main-page vertical visual layout on mobile (preserving h-32 image height), horizontal compact card on tablet/PC */}
         <div className="flex flex-col gap-5">
-          {allProjects.map((project, index) => (
-            <motion.div
-              key={project.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.06, duration: 0.6 }}
-              onClick={() => {
-                if (project.link && project.link !== '#') {
-                  window.open(project.link, '_blank', 'noopener,noreferrer');
-                }
-              }}
-              className="group bg-white hover:bg-[#a58e74] rounded-xl border border-accent/15 hover:border-accent transition-all duration-300 shadow-xs hover:shadow-lg overflow-hidden flex flex-col sm:flex-row items-center justify-between p-4 sm:p-5 md:px-8 gap-5 cursor-pointer text-left"
-            >
-              {/* Left Image Thumbnail */}
-              <div className="relative w-full sm:w-48 md:w-60 h-28 sm:h-24 rounded-lg overflow-hidden bg-pastel-cream flex-shrink-0">
-                <motion.img 
-                  src={project.image} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover"
-                  referrerPolicy="no-referrer"
-                  animate={{
-                    scale: [1, 1.06, 1],
-                  }}
-                  transition={{
-                    duration: 28,
-                    repeat: Infinity,
-                    repeatType: "reverse",
-                    ease: "easeInOut",
-                  }}
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).src = sosowonImage;
-                  }}
-                />
-              </div>
-
-              {/* Middle Title & Description */}
-              <div className="flex-1 text-left min-w-0 transition-colors duration-300">
-                <h3 className="text-base md:text-lg font-sans font-medium text-ink group-hover:text-white mb-1.5 transition-colors truncate">
-                  {project.title}
-                </h3>
-                <p className="text-[13px] text-gray-600 group-hover:text-white/90 font-sans font-normal leading-normal truncate transition-colors">
-                  {project.description}
-                </p>
-              </div>
-
-              {/* Right External Link Button with Point Color Hover Text & No Floating Text */}
-              <div className="flex-shrink-0 self-start sm:self-center">
-                {project.link && project.link !== '#' ? (
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                    className="px-4 py-2 rounded-full border border-accent/30 text-[13px] font-medium text-ink bg-white/80 group-hover:bg-white group-hover:text-accent group-hover:border-accent hover:bg-white hover:text-accent transition-all duration-150 flex items-center gap-1.5 cursor-pointer font-sans shadow-xs group/btn"
-                  >
-                    <span className="transition-colors duration-150 group-hover/btn:text-accent">웹사이트 보기</span>
-                    <ExternalLink size={13} className="transition-colors duration-150 group-hover/btn:text-accent" />
-                  </a>
-                ) : (
-                  <motion.button 
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    transition={{ duration: 0.1, ease: "easeOut" }}
-                    onClick={(e) => {
-                      e.stopPropagation();
+          {allProjects.map((project, index) => {
+            const mainPageUrl = project.link && project.link !== '#' ? new URL('/', project.link).href : '#';
+            return (
+              <motion.a
+                key={project.id}
+                href={mainPageUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.06, duration: 0.6 }}
+                className="group bg-white hover:bg-[#a58e74] rounded-xl border border-accent/15 hover:border-accent transition-all duration-300 shadow-xs hover:shadow-lg overflow-hidden flex flex-col sm:flex-row sm:items-center sm:justify-between p-5 md:max-lg:p-4.5 md:max-lg:px-6 md:max-lg:gap-4.5 md:px-8 gap-4 sm:gap-5 cursor-pointer text-left"
+              >
+                {/* Top (mobile) / Left (tablet & PC) Image Thumbnail - keeping previous padded rounded-lg design & h-32 height */}
+                <div className="relative w-full sm:w-56 md:w-72 md:max-lg:w-56 md:max-lg:h-32 lg:w-72 h-32 sm:h-28 md:h-32 rounded-lg overflow-hidden bg-pastel-cream flex-shrink-0 sm:-ml-2.5 md:-ml-3.5 sm:mr-1 md:mr-1.5 md:max-lg:ml-0 md:max-lg:mr-0">
+                  <motion.img 
+                    src={project.image} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover"
+                    referrerPolicy="no-referrer"
+                    animate={{
+                      scale: [1, 1.06, 1],
                     }}
-                    className="px-4 py-2 rounded-full border border-accent/30 text-[13px] font-medium text-ink bg-white/80 group-hover:bg-white group-hover:text-accent group-hover:border-accent hover:bg-white hover:text-accent transition-all duration-150 flex items-center gap-1.5 cursor-pointer font-sans shadow-xs group/btn"
-                  >
-                    <span className="transition-colors duration-150 group-hover/btn:text-accent">웹사이트 보기</span>
-                    <ExternalLink size={13} className="transition-colors duration-150 group-hover/btn:text-accent" />
-                  </motion.button>
-                )}
-              </div>
-            </motion.div>
-          ))}
+                    transition={{
+                      duration: 28,
+                      repeat: Infinity,
+                      repeatType: "reverse",
+                      ease: "easeInOut",
+                    }}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).src = sosowonImage;
+                    }}
+                  />
+                </div>
+
+                {/* Mobile card body wrapper matching Portfolio.tsx; sm:contents restores desktop/tablet 3-col flex */}
+                <div className="w-full flex flex-col gap-4 sm:contents">
+                  {/* Title & Description */}
+                  <div className="flex-1 text-left min-w-0 transition-colors duration-300 w-full sm:w-auto md:max-lg:px-1.5 space-y-2 sm:space-y-0">
+                    <h3 className="text-[19px] sm:text-[20px] md:max-lg:text-[18px] font-sans font-semibold text-ink group-hover:text-white sm:mb-1.5 md:max-lg:mb-1 transition-colors leading-snug sm:truncate md:max-lg:whitespace-normal break-keep">
+                      {project.title}
+                    </h3>
+                    <p className="text-[12.5px] sm:text-[13.5px] md:max-lg:text-[12.5px] leading-relaxed text-gray-600 group-hover:text-white/90 font-sans font-normal sm:truncate md:max-lg:whitespace-normal break-keep transition-colors">
+                      {project.id === 1 ? (
+                        <>
+                          <span>오대산 소나무 숲의 고요한 풍경 속에서 자연과 </span>
+                          <br className="sm:hidden" />
+                          <span>함께 머무는 독채 풀빌라</span>
+                        </>
+                      ) : (
+                        project.description
+                      )}
+                    </p>
+                  </div>
+
+                  {/* External Link Button - divider + right aligned on mobile matching Portfolio.tsx, slightly reduced button size */}
+                  <div className="pt-3 border-t border-accent/15 group-hover:border-white/20 flex items-center justify-end sm:pt-0 sm:border-t-0 sm:block flex-shrink-0 sm:self-center transition-colors duration-300">
+                    <span className="px-4 py-2 sm:px-5.5 sm:py-2.5 md:max-lg:px-5 md:max-lg:py-2 lg:px-6.5 lg:py-3 md:max-lg:text-[12.5px] rounded-full border border-accent text-[12px] sm:text-[13px] font-medium text-white bg-accent group-hover:bg-white group-hover:text-accent group-hover:border-white hover:!bg-white hover:!text-accent hover:!border-white transition-all duration-150 flex items-center gap-1.5 cursor-pointer font-sans shadow-xs group/btn whitespace-nowrap">
+                      <span className="transition-colors duration-150">웹사이트 보기</span>
+                      <ExternalLink className="w-3 h-3 sm:w-[13px] sm:h-[13px] md:max-lg:w-3.5 md:max-lg:h-3.5 transition-colors duration-150" />
+                    </span>
+                  </div>
+                </div>
+              </motion.a>
+            );
+          })}
         </div>
 
-        {/* Bottom Persuasive Consultation Banner matching 1:1 Consulting Solution */}
-        <motion.div 
-          initial={{ opacity: 0, y: 15 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="mt-14 p-7 sm:p-9 rounded-2xl bg-white/95 backdrop-blur-sm border border-accent/20 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6 text-left"
-        >
-          <div className="space-y-1.5 max-w-2xl">
-            <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-accent/10 border border-accent/20 text-[11.5px] font-semibold text-accent font-sans shadow-2xs mb-2.5">
-              <Sparkles size={12} className="text-accent" />
-              <span>1:1 맞춤 제작 솔루션</span>
-            </div>
-            <h4 className="text-[17px] sm:text-[19px] font-sans font-semibold leading-snug tracking-tight">
-              <span className="text-[#2C2824]">감성 숙소 맞춤 웹사이트, </span>
-              <span className="text-accent">스테이무드와 편하게 상담하세요</span>
-            </h4>
-            <p className="text-[13.5px] text-gray-600 font-sans font-normal leading-relaxed">
-              숙소의 무드와 특색을 꼼꼼히 살펴본 뒤 1:1 맞춤 기획서와 최적의 제작 방향을 친절히 제안해 드립니다.
-            </p>
-          </div>
-
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => handleNavigate("#contact")}
-            className="flex-shrink-0 px-7 py-3.5 rounded-full bg-accent text-white border border-accent text-[13.5px] font-semibold shadow-md hover:bg-accent-dark transition-all cursor-pointer font-sans flex items-center gap-2 group"
-          >
-            <span>상담 바로가기</span>
-            <ArrowRight size={15} className="transition-transform duration-200 group-hover:translate-x-1" />
-          </motion.button>
-        </motion.div>
-
-        {/* Separate Standalone '메인 홈으로 돌아가기' Button */}
-        <div className="mt-8 flex justify-center">
+        {/* Separate Standalone '메인 홈으로 돌아가기' Button (lowered slightly across mobile, tablet, and PC) */}
+        <div className="mt-16 sm:mt-14 md:max-lg:mt-18 lg:mt-16 flex justify-center">
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => setCurrentPage("home")}
-            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-white/90 border border-accent/20 text-[13px] text-gray-700 font-medium shadow-2xs hover:border-accent hover:text-accent hover:bg-white transition-all cursor-pointer font-sans group"
+            onClick={handleBackToHome}
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-full bg-[#FAF8F5] border border-[#8F7A63]/35 text-[13px] text-[#7A6652] font-medium hover:bg-[#8F7A63] hover:border-[#8F7A63] hover:text-white transition-all duration-200 cursor-pointer font-sans group"
           >
-            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform text-accent" />
+            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
             <span>메인 홈으로 돌아가기</span>
           </motion.button>
         </div>
@@ -473,49 +321,51 @@ export default function App() {
         currentPage={currentPage}
         isMobileMenuOpen={isMobileMenuOpen}
         onMobileMenuChange={handleMobileMenuChange}
+        activeSectionOverride={activeSectionOverride}
       />
       
       <AnimatePresence mode="wait">
         {currentPage === "home" ? renderHome() : renderProjects()}
       </AnimatePresence>
 
-      {/* Persistent floating action buttons visible on scroll (hidden when mobile menu is open) */}
-      <AnimatePresence>
-        {showScrollTop && !isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 15, scale: 0.9 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 15, scale: 0.9 }}
-            transition={{ duration: 0.2 }}
-            className="fixed bottom-6 right-6 z-50 flex flex-col items-center gap-2.5"
-          >
-            {/* Consultation Inquiry Floating Button (Icon only, exact same size: w-10 h-10) */}
-            <motion.button
-              data-floating-consult-btn
-              onClick={() => setIsConsultModalOpen((prev) => !prev)}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-full bg-accent text-white flex items-center justify-center transition-all shadow-md cursor-pointer hover:bg-accent-dark hover:shadow-lg relative border border-accent/25"
-              aria-label="스테이무드 빠른 상담"
-              title="스테이무드 빠른 상담"
-            >
-              <MessageCircle size={17} />
-            </motion.button>
+      {/* Persistent floating action buttons visible on scroll across all devices (Mobile, Tablet, Desktop) */}
+      <div
+        id="staymood-floating-controls"
+        className={`fixed bottom-6 right-6 z-[9999] flex flex-col items-center gap-2.5 md:gap-3 transition-all duration-300 ease-out pointer-events-auto ${
+          showScrollTop
+            ? "opacity-100 translate-y-0 pointer-events-auto scale-100"
+            : "opacity-0 translate-y-4 pointer-events-none scale-90"
+        }`}
+        style={{
+          position: "fixed",
+          bottom: "24px",
+          right: "24px",
+          zIndex: 9999,
+        }}
+      >
+        {/* Consultation Inquiry Floating Button (빠른 상담 플로팅 버튼 - 44px mobile / 52px tablet & PC) */}
+        <button
+          type="button"
+          data-floating-consult-btn
+          onClick={() => setIsConsultModalOpen((prev) => !prev)}
+          className="w-11 h-11 md:w-13 md:h-13 rounded-full bg-accent text-white flex items-center justify-center transition-all shadow-lg cursor-pointer hover:bg-accent-dark hover:scale-105 active:scale-95 border border-accent/25"
+          aria-label="스테이무드 빠른 상담"
+          title="스테이무드 빠른 상담"
+        >
+          <MessageCircle className="w-[18px] h-[18px] md:w-[22px] md:h-[22px]" />
+        </button>
 
-            {/* Back to Top Button (최상단 이동 버튼: w-10 h-10) */}
-            <motion.button
-              onClick={scrollToTop}
-              whileHover={{ scale: 1.05, backgroundColor: "var(--color-accent)", color: "#fff" }}
-              whileTap={{ scale: 0.95 }}
-              className="w-10 h-10 rounded-full bg-white/95 backdrop-blur-md border border-accent/15 flex items-center justify-center transition-all text-accent shadow-md cursor-pointer hover:shadow-lg"
-              aria-label="Back to top"
-              title="최상단으로 이동"
-            >
-              <ArrowUp size={16} />
-            </motion.button>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        {/* Back to Top Button (최상단 이동 버튼 - 44px mobile / 52px tablet & PC) */}
+        <button
+          type="button"
+          onClick={scrollToTop}
+          className="w-11 h-11 md:w-13 md:h-13 rounded-full bg-white/95 backdrop-blur-md border border-accent/20 flex items-center justify-center transition-all text-accent shadow-lg cursor-pointer hover:bg-accent hover:text-white hover:border-accent hover:scale-105 active:scale-95"
+          aria-label="최상단으로 이동"
+          title="최상단으로 이동"
+        >
+          <ArrowUp className="w-[18px] h-[18px] md:w-[22px] md:h-[22px]" />
+        </button>
+      </div>
 
       {/* Consultation Info Modal */}
       <ConsultationModal

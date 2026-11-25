@@ -14,6 +14,10 @@ export default function Hero() {
     document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const scrollToPhilosophy = () => {
+    document.getElementById('about')?.scrollIntoView({ behavior: 'smooth' });
+  };
+
   const openKakaoChat = () => {
     window.open('https://pf.kakao.com/_fhxirX', '_blank');
   };
@@ -46,65 +50,62 @@ export default function Hero() {
         />
         {/* Balanced elegant dark gradient overlay for natural warmth and clear text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/30 to-black/60" />
+        {/* Subtle extra dark gradient (5~10%) localized behind the text region for enhanced legibility */}
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_85%_55%_at_50%_46%,rgba(0,0,0,0.12)_0%,rgba(0,0,0,0.06)_50%,transparent_80%)] lg:bg-[radial-gradient(ellipse_52%_62%_at_30%_48%,rgba(0,0,0,0.14)_0%,rgba(0,0,0,0.07)_50%,transparent_80%)]" />
       </div>
 
       {/* Hero Main Grid Container with generous side padding */}
       <div className="w-full max-w-7xl mx-auto px-8 sm:px-12 md:px-16 lg:px-20 relative z-10 pt-10 pb-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* Left Side: Shifted slightly right for optimal visual balance */}
-          <div className="lg:col-span-7 lg:pl-6 text-left flex flex-col items-start justify-center">
+          {/* Left Side: Center-aligned on mobile & tablet, left-aligned on sm & lg */}
+          <div className="lg:col-span-7 lg:pl-6 text-center sm:text-left md:max-lg:text-center flex flex-col items-center sm:items-start md:max-lg:items-center justify-center">
 
             {/* Micro Tagline Badge above Main Title */}
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-[12px] font-medium mb-4 font-sans shadow-xs"
+              className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/15 backdrop-blur-md border border-white/25 text-white text-[11px] sm:text-[12px] font-medium mb-4 md:max-lg:mb-3 font-sans shadow-xs mx-auto sm:mx-0 md:max-lg:mx-auto lg:mx-0"
             >
-              <Sparkles size={13} className="text-accent flex-shrink-0" />
-              <span className="font-semibold text-white tracking-wide">감성 숙소 & 독채 스테이 전문</span>
+              <Sparkles className="w-3 h-3 sm:w-[13px] sm:h-[13px] text-white flex-shrink-0" />
+              <span className="font-semibold text-white tracking-wide">감성 숙소 홈페이지 제작 전문</span>
             </motion.div>
 
-            {/* Main Headline with Enhanced Legibility & Natural Shadow (Clean 2 lines) */}
+            {/* Main Headline with Enhanced Legibility & Natural Shadow */}
             <motion.h1
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.1 }}
-              className="text-xl sm:text-2xl md:text-3xl lg:text-[32px] font-sans font-semibold tracking-tight text-white leading-[1.4] mb-5 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]"
+              className="text-[23px] min-[390px]:text-[24.5px] min-[430px]:text-[27px] sm:text-2xl md:text-3xl lg:text-[32px] font-sans font-semibold tracking-tight text-white leading-[1.4] mb-5 md:max-lg:mb-7 drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)] text-center sm:text-left md:max-lg:text-center lg:text-left whitespace-nowrap min-[430px]:whitespace-normal -mx-3 sm:mx-0"
             >
-              머물고 싶은 <span className="text-[#dbccbc]">숙소 홈페이지 제작</span>, <span className="text-white">스테이무드</span>
+              공간의 <span className="text-[#dbccbc]">첫인상을 완성</span>하는 디자인
             </motion.h1>
 
-            {/* Sub-description with High Contrast & Readability (Core 1 line) */}
+            {/* Sub-description with High Contrast & Readability */}
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.15 }}
-              className="max-w-xl text-[14px] md:text-[15.5px] text-white/95 font-sans font-normal leading-relaxed mb-7 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)]"
+              className="max-w-xl text-[14px] md:text-[15.5px] text-white/95 font-sans font-normal leading-relaxed mb-9 sm:mb-7 md:max-lg:mb-10 drop-shadow-[0_2px_6px_rgba(0,0,0,0.7)] text-center sm:text-left md:max-lg:text-center lg:text-left mx-auto sm:mx-0 md:max-lg:mx-auto lg:mx-0 break-keep"
             >
-              <span>여행자의 마음을 사로잡는 감각적인 디자인으로 숙소 고유의 결을 전합니다.</span>
-              <br />
-              <span>단순한 소개를 넘어, 머물고 싶은 설렘과 직접 예약으로 이어지는 홈페이지를 완성해 보세요.</span>
+              <span className="hidden sm:inline">
+                <span>월 3팀 한정 맞춤 코딩 디렉팅으로 공간의 고유한 무드를 담아내고,</span>
+                <br />
+                <span>실제 예약 전환으로 이어지는 하이엔드 웹사이트를 완성합니다.</span>
+              </span>
+              <span className="sm:hidden">
+                월 3팀 한정 맞춤 코딩 디렉팅으로 공간의 고유한 무드를 담아내고, 실제 예약 전환으로 이어지는 하이엔드 웹사이트를 완성합니다.
+              </span>
             </motion.p>
 
-            {/* Left-Aligned Action Buttons */}
+            {/* Action Buttons: Centered on mobile & tablet, left-aligned on PC */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex flex-col sm:flex-row items-center justify-start gap-3.5 w-full sm:w-auto font-sans"
+              className="flex flex-col sm:flex-row items-center justify-center sm:justify-start md:max-lg:justify-center lg:justify-start gap-3.5 md:max-lg:gap-4 w-full sm:w-auto font-sans"
             >
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={scrollToContact}
-                className="w-full sm:w-auto px-7 py-3 bg-accent text-white rounded-full text-[13.5px] font-semibold shadow-md flex items-center justify-center gap-2 hover:bg-accent-dark transition-all cursor-pointer group"
-              >
-                <span>상담 신청하기</span>
-                <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
-              </motion.button>
-
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
@@ -113,11 +114,21 @@ export default function Hero() {
               >
                 <span>포트폴리오 살펴보기</span>
               </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={scrollToContact}
+                className="w-full sm:w-auto px-7 py-3 bg-accent text-white rounded-full text-[13.5px] font-semibold shadow-md flex items-center justify-center gap-2 hover:bg-accent-dark transition-all cursor-pointer group"
+              >
+                <span>무료 맞춤 진단받기</span>
+                <ArrowRight size={14} className="transition-transform duration-200 group-hover:translate-x-1" />
+              </motion.button>
             </motion.div>
           </div>
 
-          {/* Right Side: Clickable Quick Contact Info Cards (Lighter point color text & arrow hover color) */}
-          <div className="lg:col-span-5 flex flex-col gap-3 font-sans lg:items-end">
+          {/* Right Side: Clickable Quick Contact Info Cards (hidden on mobile and tablet, visible on sm & PC) */}
+          <div className="lg:col-span-5 hidden sm:flex md:max-lg:hidden lg:flex flex-col gap-3 font-sans lg:items-end">
             <motion.div
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
@@ -187,6 +198,7 @@ export default function Hero() {
                 </AnimatePresence>
               </div>
             </motion.div>
+
           </div>
 
         </div>
@@ -194,7 +206,7 @@ export default function Hero() {
 
       {/* Sleek Minimalist Scroll Down Indicator (Mouse Wheel Frame) */}
       <motion.div
-        onClick={scrollToWork}
+        onClick={scrollToPhilosophy}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.8 }}
